@@ -48,6 +48,7 @@
         border-bottom: 1px solid var(--glass-border);
         z-index: 1000;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        animation: fadeInDown 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .tabs-container {
@@ -66,6 +67,11 @@
         display: flex;
         align-items: center;
         gap: 8px;
+        transition: transform 0.3s ease;
+    }
+
+    .brand-logo:hover {
+        transform: scale(1.05);
     }
 
     .tabs-list {
@@ -85,11 +91,12 @@
         font-size: 15px;
         font-weight: 500;
         position: relative;
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
 
     .tab-link:hover {
         color: var(--light-green);
+        transform: translateY(-2px);
     }
 
     .tab-link.active {
@@ -97,16 +104,23 @@
         font-weight: 700;
     }
 
-    .tab-link.active::after {
+    .tab-link::after {
         content: "";
         position: absolute;
         bottom: 0;
-        left: 0;
-        width: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0%;
         height: 3px;
         background: var(--light-green);
         border-radius: 3px 3px 0 0;
         box-shadow: 0 0 10px var(--light-green);
+        transition: width 0.3s ease;
+    }
+
+    .tab-link.active::after,
+    .tab-link:hover::after {
+        width: 100%;
     }
 
     /* الحاوية الرئيسية للمحتوى */
@@ -131,6 +145,14 @@
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
         text-align: right;
         width: 100%;
+        animation: scaleUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+
+    .content-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 25px rgba(82, 183, 136, 0.15);
+        border-color: rgba(116, 198, 157, 0.4);
     }
 
     .page-title {
@@ -151,6 +173,41 @@
         line-height: 1.8;
         font-weight: 400;
         margin: 0;
+        animation: fadeIn 1s ease forwards;
+        animation-delay: 0.3s;
+        opacity: 0;
+    }
+
+    /* Animations Definitions */
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes scaleUp {
+        from {
+            opacity: 0;
+            transform: scale(0.93) translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
     }
 
     @media (max-width: 480px) {
