@@ -196,6 +196,53 @@
         color: #d8f3dc;
     }
 
+    /* Animated Box للتنبيه بالفيديو التفاعلي */
+    .animated-video-box {
+        position: relative;
+        background: linear-gradient(135deg, rgba(82, 183, 136, 0.25), rgba(27, 67, 50, 0.85));
+        border: 2px solid var(--light-green);
+        border-radius: 16px;
+        padding: 14px;
+        width: 100%;
+        margin-bottom: 15px;
+        text-align: center;
+        box-shadow: 0 0 20px rgba(82, 183, 136, 0.4);
+        display: none; /* يظهر فقط عند الاكتشاف */
+        animation: pulseBox 1.8s infinite ease-in-out;
+    }
+
+    @keyframes pulseBox {
+        0% { transform: scale(1); box-shadow: 0 0 10px rgba(82, 183, 136, 0.3); }
+        50% { transform: scale(1.02); box-shadow: 0 0 25px rgba(82, 183, 136, 0.7); }
+        100% { transform: scale(1); box-shadow: 0 0 10px rgba(82, 183, 136, 0.3); }
+    }
+
+    .animated-video-box p {
+        margin: 0 0 10px 0;
+        font-size: 14.5px;
+        font-weight: 700;
+        color: #ffffff;
+    }
+
+    .video-btn {
+        display: inline-block;
+        background: var(--light-green);
+        color: #081c15;
+        padding: 8px 16px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 13.5px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        transition: all 0.2s ease;
+    }
+
+    .video-btn:hover {
+        background: #ffffff;
+        color: #1b4332;
+        transform: translateY(-2px);
+    }
+
     /* حاوية الكاميرا والشعاع المتحرك المقيدة بـ 320px لضبط الحجم */
     .camera-card {
         position: relative;
@@ -276,6 +323,12 @@
             <p id="resultInstructions">💡 الإرشادات: يرجى توجيه الكاميرا نحو المنتج</p>
         </div>
 
+        <!-- صندوق متحرك يعرض رابط فكرة إعادة التدوير عند الاكتشاف -->
+        <div class="animated-video-box" id="animatedVideoBox">
+            <p id="animatedBoxText">🎬 فيديو أفكار إعادة التدوير:</p>
+            <a id="animatedVideoBtn" href="#" target="_blank" class="video-btn">🎥 مشاهدة فكرة إعادة التدوير</a>
+        </div>
+
         <!-- حاوية الكاميرا -->
         <div class="camera-card">
             <video id="webcam" autoplay playsinline muted></video>
@@ -315,22 +368,30 @@ const recyclingData = {
     "plastic": {
         name: "بلاستيك",
         bin: "الصندوق الأصفر (البلاستيك)",
-        instructions: "إفراغ السائل، ضغط الزجاجة لتوفير المساحة، وإغلاق الغطاء."
+        instructions: "إفراغ السائل، ضغط الزجاجة لتوفير المساحة، وإغلاق الغطاء.",
+        videoText: "🎬 فيديو أفكار إعادة التدوير البلاستيك:",
+        videoUrl: "https://www.youtube.com/watch?v=rnkp7ZgA3-Q"
     },
     "aluminum_metal": {
         name: "معادن / ألومنيوم",
         bin: "الصندوق الفضي / المعادن",
-        instructions: "ضغط العلبة يدوياً وتقليل حجمها قبل إلقائها."
+        instructions: "ضغط العلبة يدوياً وتقليل حجمها قبل إلقائها.",
+        videoText: "🎬 فيديو أفكار إعادة التدوير الحديد:",
+        videoUrl: "https://www.youtube.com/shorts/21m2iv61S_E"
     },
     "cardboard": {
         name: "كرتون وورق مقوى",
         bin: "الصندوق الأزرق (الورق والكرتون)",
-        instructions: "إزالة أي مواد بلاستيكية أو شريط لاصق وطَي العبوة تماماً."
+        instructions: "إزالة أي مواد بلاستيكية أو شريط لاصق وطَي العبوة تماماً.",
+        videoText: "🎬 فيديو أفكار إعادة التدوير الكرتون:",
+        videoUrl: "https://www.youtube.com/watch?v=aQpbjDCOrgg"
     },
     "glass": {
         name: "زجاج",
         bin: "الصندوق الأخضر (الزجاج)",
-        instructions: "التأكد من أن الزجاج غير مكسور وفصل الأغطية المعدنية."
+        instructions: "التأكد من أن الزجاج غير مكسور وفصل الأغطية المعدنية.",
+        videoText: "🎬 فيديو أفكار إعادة التدوير الزجاج:",
+        videoUrl: "https://www.youtube.com/watch?v=RTXkmyrRPeU"
     }
 };
 
@@ -364,7 +425,9 @@ async function classifyFrame(videoElement) {
         const details = recyclingData[classKey] || {
             name: classKey,
             bin: "عام",
-            instructions: "إعادة تدوير عامة."
+            instructions: "إعادة تدوير عامة.",
+            videoText: "🎬 فيديو أفكار إعادة التدوير:",
+            videoUrl: "https://www.youtube.com/watch?v=k1gtC2XZmGc"
         };
 
         return {
@@ -392,11 +455,19 @@ window.addEventListener('DOMContentLoaded', async () => {
     await loadModel();
     
     const myVideoElement = document.getElementById('webcam'); 
+    const animatedBox = document.getElementById('animatedVideoBox');
+    const animatedText = document.getElementById('animatedBoxText');
+    const animatedBtn = document.getElementById('animatedVideoBtn');
     
     startPredictionLoop(myVideoElement, (data) => {
         document.getElementById('resultTitle').innerText = `المنتج: ${data.details.name} (${data.confidence}%)`;
         document.getElementById('resultBin').innerText = `♻️ صندوق الإلقاء: ${data.details.bin}`;
         document.getElementById('resultInstructions').innerText = `💡 الإرشادات: ${data.details.instructions}`;
+        
+        // إظهار الصندوق المتحرك وتحديث الروابط حسب المادة المكتشفة
+        animatedText.innerText = data.details.videoText;
+        animatedBtn.href = data.details.videoUrl;
+        animatedBox.style.display = 'block';
     });
 });
 </script>
